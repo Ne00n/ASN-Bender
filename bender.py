@@ -4,6 +4,7 @@ path = os.path.dirname(os.path.realpath(__file__))
 
 asn = sys.argv[1]
 gw = sys.argv[2]
+clear = True if len(sys.argv) > 3 else False
 
 def cmd(cmd):
     p = subprocess.run(cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -41,4 +42,9 @@ if not os.path.isfile(f"{path}/cache/{asn}.txt"):
 with open(f"{path}/cache/{asn}.txt", 'r') as file: ipList =  file.read()
 for line in ipList.splitlines():
     if "#" in line: continue
-    cmd(f'ip route add {line} via {gw} dev vxlan1 table ASN')
+    if clear:
+        print(f"Removing {line} from routes")
+        cmd(f'ip route del {line} via {gw} dev vxlan1 table ASN')
+    else:
+        print(f"Applying {line} to routes")
+        cmd(f'ip route add {line} via {gw} dev vxlan1 table ASN')
