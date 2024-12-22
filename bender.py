@@ -40,11 +40,10 @@ if not os.path.isfile(f"{path}/cache/{asn}.txt"):
     with open(f"{path}/cache/{asn}.txt", 'w') as file: file.write(request.text)
 
 with open(f"{path}/cache/{asn}.txt", 'r') as file: ipList =  file.read()
+print(f"Removing {len(ipList.splitlines())} from routes") if clear else print(f"Applying {len(ipList.splitlines())} to routes")
 for line in ipList.splitlines():
     if "#" in line: continue
     if clear:
-        print(f"Removing {line} from routes")
         cmd(f'ip route del {line} via {gw} dev vxlan1 table ASN')
     else:
-        print(f"Applying {line} to routes")
         cmd(f'ip route add {line} via {gw} dev vxlan1 table ASN')
