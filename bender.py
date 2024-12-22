@@ -17,23 +17,6 @@ if not "ASN" in rt_tables:
 route = cmd("ip rule list table ASN all")[0]
 if not "ASN" in route: cmd('ip rule add from 0.0.0.0/0 table ASN')
 
-if not os.path.isfile(f"{path}/allocation.json"): 
-    allocation = {}
-    with open(f"{path}/allocation.json", 'w') as f: json.dump(allocation, f, indent=4)
-
-with open(f"{path}/allocation.json") as handle: allocation = json.loads(handle.read())
-
-usedIDs = list(allocation.values()) if allocation else []
-if not asn in allocation:
-    for freeID in range(200, 250):
-        if freeID not in usedIDs:
-            print(f"Allocated id {freeID} for {asn}")
-            allocation[asn] = currentID = freeID
-            with open(f"{path}/allocation.json", 'w') as f: json.dump(allocation, f, indent=4)
-            break
-else:
-    currentID = allocation[asn]
-
 if not os.path.isfile(f"{path}/cache/{asn}.txt"):
     request = requests.get(f"https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/{asn}/ipv4-aggregated.txt", timeout=(5,5))
     if request.status_code != 200: exit(f"Unable to fetch ips for {asn}")
