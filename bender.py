@@ -27,7 +27,7 @@ if not success: exit("Failed to fetch locations.json")
 availableLocations = req.json()
 for region,locations in availableLocations.items():
     for location in locations:
-        if not location in config['mapping']: print(f"{location} is not in mapping!")
+        if not location in config['mapping']: exit(f"{location} is not in mapping!")
 
 data = {}
 for ASN in config['asnList']:
@@ -58,9 +58,6 @@ else:
     with open(f"{path}/cache/routing.json", 'w') as f: json.dump(routing, f)
 
 for subnet, details in routing.items():
-    if not details['region'] in config['mapping']:
-        print(f"{region} is not in mapping!")
-        continue
     gw = config['mapping'][details['region']]
     if clear:
         tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
