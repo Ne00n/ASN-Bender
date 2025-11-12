@@ -2,7 +2,7 @@ from Class.base import Base
 import subprocess, requests, json, sys, os, re
 
 clear = False
-sys.argv = sys.argv[2:]
+sys.argv = sys.argv[1:]
 for param in sys.argv:
     if param.lower() == "clear": clear = True
 
