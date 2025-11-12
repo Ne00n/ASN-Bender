@@ -1,32 +1,68 @@
+from Class.base import Base
 import subprocess, requests, json, sys, os, re
 
+clear = False
+sys.argv = sys.argv[2:]
+for param in sys.argv:
+    if param.lower() == "clear": clear = True
+
+tools = Base()
 path = os.path.dirname(os.path.realpath(__file__))
+with open(f"{path}/config.json") as handle: config =  json.loads(handle.read())
 
-asn = sys.argv[1]
-gw = sys.argv[2]
-clear = True if len(sys.argv) > 3 else False
+tools = Base()
+print("Loading asn.json")
+success, req = tools.call("https://routing.serv.app/asn.json")
+if not success: exit("Failed to fetch asn.json")
 
-def cmd(cmd):
-    p = subprocess.run(cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    return [p.stdout.decode('utf-8'),p.stderr.decode('utf-8')]
+availableASNs = req.json()
+for selectedASN in config['asnList']:
+    if not selectedASN in availableASNs:
+        exit(f"ASN {selectedASN} not listed/found.")
 
-with open("/etc/iproute2/rt_tables", 'r') as file: rt_tables =  file.read()
-if not "ASN" in rt_tables:
-    with open("/etc/iproute2/rt_tables", "a") as tables: tables.write("330 ASN\n")
+print("Loading locations.json")
+success, req = tools.call("https://routing.serv.app/locations.json")
+if not success: exit("Failed to fetch locations.json")
 
-route = cmd("ip rule list table ASN all")[0]
-if not "ASN" in route: cmd('ip rule add from 0.0.0.0/0 table ASN')
+availableLocations = req.json()
+for region,locations in availableLocations.items():
+    for location in locations:
+        if not location in config['mapping']: print(f"{location} is not in mapping!")
 
-if not os.path.isfile(f"{path}/cache/{asn}.txt"):
-    request = requests.get(f"https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/{asn}/ipv4-aggregated.txt", timeout=(5,5))
-    if request.status_code != 200: exit(f"Unable to fetch ips for {asn}")
-    with open(f"{path}/cache/{asn}.txt", 'w') as file: file.write(request.text)
+data = {}
+for ASN in config['asnList']:
+    print(f"Getting files for AS{ASN}")
+    for region,locations in availableLocations.items():
+        for location in locations:
+            success, req = tools.call(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
+            if not success: exit(f"Failed to fetch {ASN}.json from {location}")
+            if not ASN in data: data[ASN] = {}
+            if not location in data[ASN]: data[ASN][location] = req.json()
 
-with open(f"{path}/cache/{asn}.txt", 'r') as file: ipList =  file.read()
-print(f"Removing {len(ipList.splitlines())} routes") if clear else print(f"Applying {len(ipList.splitlines())} routes")
-for line in ipList.splitlines():
-    if "#" in line: continue
+routing = {}
+for asn,regions in data.items():
+    for region,payload in regions.items():
+        for prefix,subnets in payload.items():
+            if "::" in prefix: continue
+            for subnet, latency in subnets.items():
+                if not "/" in subnet: continue
+                avrg = tools.getAvrg(latency)
+                if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                if routing[subnet]['latency'] > avrg:
+                    routing[subnet] = {"latency":avrg,"region":region}
+
+#on clear, use latest.json
+if clear:
+    with open(f"{path}/cache/routing.json") as handle: routing =  json.loads(handle.read())
+else:
+    with open(f"{path}/cache/routing.json", 'w') as f: json.dump(routing, f)
+
+for subnet, details in routing.items():
+    if not details['region'] in config['mapping']:
+        print(f"{region} is not in mapping!")
+        continue
+    gw = config['mapping'][details['region']]
     if clear:
-        cmd(f'ip route del {line} via {gw} dev vxlan1 table ASN')
+        tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
     else:
-        cmd(f'ip route add {line} via {gw} dev vxlan1 table ASN')
+        tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
