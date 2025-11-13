@@ -1,4 +1,5 @@
-import subprocess, requests, time, re
+import subprocess, ipaddress, requests, time, re
+from collections import defaultdict
 
 class Base:
 
@@ -35,3 +36,15 @@ class Base:
         for row in pings:
             avrg += float(row[1])
         return round(avrg / len(pings),1)
+
+    def aggregate(self,routing):
+        regionIPs = defaultdict(list)
+        for subnet, details in routing.items():
+            regionIPs[details['region']].append(ipaddress.ip_network(subnet))
+        
+        aggregated = {}
+        for region, ips in regionIPs.items():
+            ips.sort()
+            aggregated_networks = ipaddress.collapse_addresses(ips)
+            aggregated[region] = [str(net) for net in aggregated_networks]
+        return aggregated

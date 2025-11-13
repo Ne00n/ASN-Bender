@@ -65,17 +65,19 @@ for asn,regions in data.items():
                     if routing[subnet]['latency'] > avrg:
                         routing[subnet] = {"latency":avrg,"region":region}
 
+aggregated = tools.aggregate(routing)
 #on clear, use latest.json
 if clear:
-    with open(f"{path}/cache/routing.json") as handle: routing =  json.loads(handle.read())
+    with open(f"{path}/cache/routing.json") as handle: aggregated =  json.loads(handle.read())
 else:
-    with open(f"{path}/cache/routing.json", 'w') as f: json.dump(routing, f)
+    with open(f"{path}/cache/routing.json", 'w') as f: json.dump(aggregated, f)
 
-for subnet, details in routing.items():
-    gw = config['mapping'][details['region']]
-    if clear:
-        tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
-    else:
-        tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
+for region, subnets in aggregated.items():
+    gw = config['mapping'][region]
+    for subnet in subnets:
+        if clear:
+            tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
+        else:
+            tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
 
 print("Done")
