@@ -49,12 +49,21 @@ for asn,regions in data.items():
     for region,payload in regions.items():
         for prefix,subnets in payload.items():
             if "::" in prefix: continue
+            settings = {}
             for subnet, latency in subnets.items():
+                if subnet == "settings": settings = latency
                 if not "/" in subnet: continue
-                avrg = tools.getAvrg(latency)
-                if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
-                if routing[subnet]['latency'] > avrg:
-                    routing[subnet] = {"latency":avrg,"region":region}
+                if settings and settings['any']:
+                    for entry in latency:
+                        subnet, avrg = f"{entry[0]}/32", float(entry[1])
+                        if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                        if routing[subnet]['latency'] > avrg:
+                            routing[subnet] = {"latency":avrg,"region":region}
+                else:
+                    avrg = tools.getAvrg(latency)
+                    if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                    if routing[subnet]['latency'] > avrg:
+                        routing[subnet] = {"latency":avrg,"region":region}
 
 #on clear, use latest.json
 if clear:
