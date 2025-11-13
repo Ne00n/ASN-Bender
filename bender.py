@@ -68,3 +68,5 @@ for subnet, details in routing.items():
         tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
     else:
         tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
+
+print("Done")
