@@ -16,9 +16,14 @@ success, req = tools.call("https://routing.serv.app/asn.json")
 if not success: exit("Failed to fetch asn.json")
 
 availableASNs = req.json()
+availableASNList = []
+for availableASN in availableASNs:
+    availableASNList.append(int(availableASN))
+
 for selectedASN in config['asnList']:
-    if not selectedASN in availableASNs:
-        exit(f"ASN {selectedASN} not listed/found.")
+    for availableASN in availableASNs:
+        if not selectedASN in availableASNList:
+            exit(f"ASN {selectedASN} not listed/found.")
 
 print("Loading locations.json")
 success, req = tools.call("https://routing.serv.app/locations.json")
