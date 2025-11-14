@@ -18,6 +18,7 @@ availableASNList = []
 for availableASN in availableASNs:
     availableASNList.append(int(availableASN))
 
+if 0 in config['asnList']: config['asnList'] = availableASNList
 for selectedASN in config['asnList']:
     for availableASN in availableASNs:
         if not selectedASN in availableASNList:
