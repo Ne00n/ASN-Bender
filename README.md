@@ -24,7 +24,7 @@ Add a lookup rule
 ```
 ip rule add from 0.0.0.0/0 table ASN
 ```
-Any traffic, will look up the routing rules provided by the table ASN.
+Any traffic, will look up the routing rules provided by the table ASN.<br>
 Which is used by the ASN-Bender.
 
 **Usage**<br>
