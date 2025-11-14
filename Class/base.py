@@ -1,22 +1,28 @@
-import subprocess, ipaddress, requests, time, re
+import subprocess, ipaddress, requests, time, json, re, os
 from collections import defaultdict
 
 class Base:
 
+    def __init__(self,path):
+        self.path = path
+
     def call(self,url,max=5):
-        allowedCodes, crashed = [200], False
+        allowedCodes = [200]
         for run in range(1,max):
             try:
+                path =  '/'.join(url.split("/")[3:])
+                os.makedirs(os.path.dirname(f"{self.path}/cache/{path}"), exist_ok=True)
+                if os.path.isfile(f"{self.path}/cache/{path}") and os.path.getmtime(f"{self.path}/cache/{path}") + (60*60) > int(time.time()):
+                    with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
+                    return True,file
                 req = requests.get(url, timeout=(5,5))
-                if req.status_code in allowedCodes: return True,req
-                crashed = False
+                if req.status_code in allowedCodes: 
+                    file = req.json()
+                    with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
+                    return True,file
             except Exception as ex:
-                crashed = True
                 pass
-            if run == 4 and not crashed:
-                return False,req
-            elif run == 4:
-                return False,None
+            if run == 4: return False,{}
             time.sleep(2)
 
     def cmd(self,cmd,timeout=None):

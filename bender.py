@@ -6,16 +6,14 @@ sys.argv = sys.argv[1:]
 for param in sys.argv:
     if param.lower() == "clear": clear = True
 
-tools = Base()
 path = os.path.dirname(os.path.realpath(__file__))
+tools = Base(path)
 with open(f"{path}/config.json") as handle: config =  json.loads(handle.read())
 
-tools = Base()
 print("Loading asn.json")
-success, req = tools.call("https://routing.serv.app/asn.json")
+success, availableASNs = tools.call("https://routing.serv.app/asn.json")
 if not success: exit("Failed to fetch asn.json")
 
-availableASNs = req.json()
 availableASNList = []
 for availableASN in availableASNs:
     availableASNList.append(int(availableASN))
@@ -26,10 +24,9 @@ for selectedASN in config['asnList']:
             exit(f"ASN {selectedASN} not listed/found.")
 
 print("Loading locations.json")
-success, req = tools.call("https://routing.serv.app/locations.json")
+success, availableLocations = tools.call("https://routing.serv.app/locations.json")
 if not success: exit("Failed to fetch locations.json")
 
-availableLocations = req.json()
 for region,locations in availableLocations.items():
     for location in locations:
         if not location in config['mapping']: exit(f"{location} is not in mapping!")
@@ -39,10 +36,10 @@ for ASN in config['asnList']:
     print(f"Getting files for AS{ASN}")
     for region,locations in availableLocations.items():
         for location in locations:
-            success, req = tools.call(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
+            success, asnData = tools.call(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
             if not success: exit(f"Failed to fetch {ASN}.json from {location}")
             if not ASN in data: data[ASN] = {}
-            if not location in data[ASN]: data[ASN][location] = req.json()
+            if not location in data[ASN]: data[ASN][location] = asnData
 
 routing = {}
 for asn,regions in data.items():
