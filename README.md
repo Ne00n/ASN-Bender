@@ -8,7 +8,7 @@ Lets say you have your own VPN Network, e.g 172.16.5.0/24.<br>
 And you want to tunnel, selectively, game traffic over it.
 
 For example, TF2 or CS2, which is the ASN 32590 for Valve.<br>
-Traffic via Frankfurt goes via your Frankfurt PoP, Amsterdam via Amsterdam node etc.
+Traffic via Frankfurt goes via your Frankfurt PoP, Amsterdam via your Amsterdam PoP etc.
 
 **Setup**<br>
 
