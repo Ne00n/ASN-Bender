@@ -3,16 +3,11 @@ from collections import defaultdict
 
 class Base:
 
-    def call(self,url,method="GET",payload={},headers={},max=5):
+    def call(self,url,max=5):
         allowedCodes, crashed = [200], False
         for run in range(1,max):
             try:
-                if method == "POST":
-                    req = requests.post(url, json=payload, timeout=(5,5))
-                elif method == "GET":
-                    req = requests.get(url, headers=headers, timeout=(5,5))
-                else:
-                    req = requests.patch(url, json=payload, timeout=(5,5))
+                req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes: return True,req
                 crashed = False
             except Exception as ex:
