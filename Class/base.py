@@ -7,14 +7,25 @@ class Base:
         self.path = path
 
     def call(self,url,max=5):
-        allowedCodes = [200]
+        allowedCodes, alwaysFetch = [200], ("asn.json","locations.json","version.json")
         for run in range(1,max):
             try:
-                path =  '/'.join(url.split("/")[3:])
+                path, last =  '/'.join(url.split("/")[3:]), url.split("/")[-1]
+                #cache
+                if os.path.isfile(f"{self.path}/cache/{path}"):
+                    #not older than 1 hour
+                    if os.path.getmtime(f"{self.path}/cache/{path}") + (60*60) > int(time.time()):
+                        with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
+                        return True,file
+                    elif not path.endswith(alwaysFetch):
+                        versionFile = path.replace(last,"version.json")
+                        if os.path.isfile(f"{self.path}/cache/{versionFile}"):
+                            with open(f"{self.path}/cache/{versionFile}") as handle: version =  json.loads(handle.read())
+                            if version['version'] < os.path.getatime(f"{self.path}/cache/{path}"):
+                                with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
+                                return True,file
+                #download
                 os.makedirs(os.path.dirname(f"{self.path}/cache/{path}"), exist_ok=True)
-                if os.path.isfile(f"{self.path}/cache/{path}") and os.path.getmtime(f"{self.path}/cache/{path}") + (60*60) > int(time.time()):
-                    with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
-                    return True,file
                 print(f"Fetching {url}")
                 req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes: 
