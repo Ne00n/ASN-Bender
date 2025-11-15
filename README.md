@@ -10,6 +10,9 @@ And you want to tunnel, selectively, game traffic over it.
 For example, TF2 or CS2, which is the ASN 32590 for Valve.<br>
 Traffic via Frankfurt goes via your Frankfurt PoP, Amsterdam via your Amsterdam PoP etc.
 
+**Depdencies**<br>
+tqdm / python3-tqdm (Debian)
+
 **Setup**<br>
 
 Edit your config.json, add your ASN's and setup the mapping
