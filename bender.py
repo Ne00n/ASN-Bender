@@ -81,6 +81,7 @@ if clear:
 else:
     with open(f"{path}/cache/routing.json", 'w') as f: json.dump(aggregated, f)
 
+print("Applying routing rules...")
 for region, subnets in aggregated.items():
     gw = config['mapping'][region]
     for subnet in subnets:
