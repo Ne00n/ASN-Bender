@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import subprocess, requests, json, sys, os, re
 from Class.base import Base
+from tqdm import tqdm
 
 clear = False
 sys.argv = sys.argv[1:]
@@ -41,12 +42,12 @@ for ASN in config['asnList']:
             if f"https://routing.serv.app/data/{region}/{location}/version.json" in asnFiles: continue
             asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/version.json")
 
+print("Loading latency data")
 with ThreadPoolExecutor(max_workers=4) as executor:
-    executor.map(tools.call, asnFiles)
+    list(tqdm(executor.map(tools.call, asnFiles), total=len(asnFiles)))
 
 data = {}
 for ASN in config['asnList']:
-    print(f"Loading files for AS{ASN}")
     for region,locations in availableLocations.items():
         for location in locations:
             with open(f"{path}/cache/data/{region}/{location}/{ASN}.json") as handle: asnData =  json.loads(handle.read())

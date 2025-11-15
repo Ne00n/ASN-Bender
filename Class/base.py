@@ -26,7 +26,6 @@ class Base:
                                 return True,file
                 #download
                 os.makedirs(os.path.dirname(f"{self.path}/cache/{path}"), exist_ok=True)
-                print(f"Fetching {url}")
                 req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes: 
                     file = req.json()
