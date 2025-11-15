@@ -18,9 +18,14 @@ class Base:
                 print(f"Fetching {url}")
                 req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes: 
-                    file = req.json()
-                    with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
-                    return True,file
+                    newFile = req.json()
+                    if os.path.isfile(f"{self.path}/cache/{path}"):
+                        with open(f"{self.path}/cache/{path}") as handle: oldFile =  json.loads(handle.read())
+                        if oldFile != newFile:
+                            with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(newFile, f)
+                    else:
+                        with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(newFile, f)
+                    return True,newFile
             except Exception as ex:
                 pass
             if run == 4: return False,{}
