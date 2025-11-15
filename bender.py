@@ -30,12 +30,14 @@ success, availableLocations = tools.call("https://routing.serv.app/locations.jso
 if not success: exit("Failed to fetch locations.json")
 
 for region,locations in availableLocations.items():
+    if region == "metadata": continue
     for location in locations:
         if not location in config['mapping']: exit(f"{location} is not in mapping!")
 
 asnFiles = []
 for ASN in config['asnList']:
     for region,locations in availableLocations.items():
+        if region == "metadata": continue
         for location in locations:
             asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
 
@@ -46,6 +48,7 @@ data = {}
 for ASN in config['asnList']:
     print(f"Loading files for AS{ASN}")
     for region,locations in availableLocations.items():
+        if region == "metadata": continue
         for location in locations:
             with open(f"{path}/cache/data/{region}/{location}/{ASN}.json") as handle: asnData =  json.loads(handle.read())
             if not ASN in data: data[ASN] = {}
