@@ -11,7 +11,8 @@ For example, TF2 or CS2, which is the ASN 32590 for Valve.<br>
 Traffic via Frankfurt goes via your Frankfurt PoP, Amsterdam via your Amsterdam PoP etc.
 
 **Depdencies**<br>
-tqdm / python3-tqdm (Debian)
+requests / python3-requests (Debian)<br>
+tqdm     / python3-tqdm (Debian)<br>
 
 **Setup**<br>
 
