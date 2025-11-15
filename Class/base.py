@@ -19,7 +19,6 @@ class Base:
                 req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes: 
                     file = req.json()
-                    if not "asn.json" in url: file['metadata'] = {'eTag':req.headers.get('ETag')}
                     with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
                     return True,file
             except Exception as ex:
