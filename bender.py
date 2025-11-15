@@ -1,5 +1,6 @@
-from Class.base import Base
+from concurrent.futures import ThreadPoolExecutor
 import subprocess, requests, json, sys, os, re
+from Class.base import Base
 
 clear = False
 sys.argv = sys.argv[1:]
@@ -32,13 +33,21 @@ for region,locations in availableLocations.items():
     for location in locations:
         if not location in config['mapping']: exit(f"{location} is not in mapping!")
 
-data = {}
+asnFiles = []
 for ASN in config['asnList']:
-    print(f"Getting files for AS{ASN}")
     for region,locations in availableLocations.items():
         for location in locations:
-            success, asnData = tools.call(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
-            if not success: exit(f"Failed to fetch {ASN}.json from {location}")
+            asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
+
+with ThreadPoolExecutor(max_workers=4) as executor:
+    executor.map(tools.call, asnFiles)
+
+data = {}
+for ASN in config['asnList']:
+    print(f"Loading files for AS{ASN}")
+    for region,locations in availableLocations.items():
+        for location in locations:
+            with open(f"{path}/cache/data/{region}/{location}/{ASN}.json") as handle: asnData =  json.loads(handle.read())
             if not ASN in data: data[ASN] = {}
             if not location in data[ASN]: data[ASN][location] = asnData
 

@@ -15,6 +15,7 @@ class Base:
                 if os.path.isfile(f"{self.path}/cache/{path}") and os.path.getmtime(f"{self.path}/cache/{path}") + (60*60) > int(time.time()):
                     with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
                     return True,file
+                print(f"Fetching {url}")
                 req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes: 
                     file = req.json()
