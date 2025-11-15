@@ -38,6 +38,8 @@ for ASN in config['asnList']:
     for region,locations in availableLocations.items():
         for location in locations:
             asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
+            if f"https://routing.serv.app/data/{region}/{location}/version.json" in asnFiles: continue
+            asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/version.json")
 
 with ThreadPoolExecutor(max_workers=4) as executor:
     executor.map(tools.call, asnFiles)
