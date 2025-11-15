@@ -63,7 +63,7 @@ for asn,regions in data.items():
             for subnet, latency in subnets.items():
                 if subnet == "settings": settings = latency
                 if not "/" in subnet: continue
-                if settings and settings['any']:
+                if settings and 'any' in:
                     for entry in latency:
                         subnet, avrg = f"{entry[0]}/32", float(entry[1])
                         if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
