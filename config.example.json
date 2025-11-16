@@ -1,5 +1,6 @@
 {
     "asnList":[32590],
+    "asnTags":["valve"],
     "mapping":{
         "FRA":"10.0.251.2",
         "MTL":"10.0.251.60"

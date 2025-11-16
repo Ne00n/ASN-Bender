@@ -16,15 +16,25 @@ print("Loading asn.json")
 success, availableASNs = tools.call("https://routing.serv.app/asn.json")
 if not success: exit("Failed to fetch asn.json")
 
-availableASNList = []
-for availableASN in availableASNs:
+availableASNList, availableTags = [], []
+for availableASN, details in availableASNs.items():
     availableASNList.append(int(availableASN))
+    if 'tags' in details: availableTags += details['tags']
 
+toLoad = []
 if 0 in config['asnList']: config['asnList'] = availableASNList
 for selectedASN in config['asnList']:
     for availableASN in availableASNs:
         if not selectedASN in availableASNList:
             exit(f"ASN {selectedASN} not listed/found.")
+    toLoad.append(selectedASN)
+
+for selectedTag in config['asnTags']:
+    for asn, details in availableASNs.items():
+        if not selectedTag in availableTags:
+            exit(f"Tag {selectedTag} not listed/found.")
+        elif "tags" in details and selectedTag in details['tags']:
+            toLoad.append(int(asn))
 
 print("Loading locations.json")
 success, availableLocations = tools.call("https://routing.serv.app/locations.json")
@@ -35,10 +45,11 @@ for region,locations in availableLocations.items():
         if not location in config['mapping']: exit(f"{location} is not in mapping!")
 
 asnFiles = []
-for ASN in config['asnList']:
+toLoad = list(set(toLoad))
+for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
-            asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/{ASN}.json")
+            asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/{asn}.json")
             if f"https://routing.serv.app/data/{region}/{location}/version.json" in asnFiles: continue
             asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/version.json")
 
@@ -47,12 +58,12 @@ with ThreadPoolExecutor(max_workers=4) as executor:
     list(tqdm(executor.map(tools.call, asnFiles), total=len(asnFiles)))
 
 data = {}
-for ASN in config['asnList']:
+for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
-            with open(f"{path}/cache/data/{region}/{location}/{ASN}.json") as handle: asnData =  json.loads(handle.read())
-            if not ASN in data: data[ASN] = {}
-            if not location in data[ASN]: data[ASN][location] = asnData
+            with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
+            if not asn in data: data[asn] = {}
+            if not location in data[asn]: data[asn][location] = asnData
 
 routing = {}
 for asn,regions in data.items():
