@@ -52,11 +52,11 @@ class Base:
     def aggregate(self,routing):
         regionIPs = defaultdict(list)
         for subnet, details in routing.items():
-            regionIPs[details['region']].append(ipaddress.ip_network(subnet))
+            regionIPs[details['location']].append(ipaddress.ip_network(subnet))
         
         aggregated = {}
-        for region, ips in regionIPs.items():
+        for location, ips in regionIPs.items():
             ips.sort()
             aggregated_networks = ipaddress.collapse_addresses(ips)
-            aggregated[region] = [str(net) for net in aggregated_networks]
+            aggregated[location] = [str(net) for net in aggregated_networks]
         return aggregated

@@ -74,12 +74,12 @@ for asn in toLoad:
                                 subnet, avrg = f"{entry[0]}/32", float(entry[1])
                                 if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
                                 if routing[subnet]['latency'] > avrg:
-                                    routing[subnet] = {"latency":avrg,"region":location}
+                                    routing[subnet] = {"latency":avrg,"location":location}
                         else:
                             avrg = tools.getAvrg(latency)
                             if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
                             if routing[subnet]['latency'] > avrg:
-                                routing[subnet] = {"latency":avrg,"region":location}
+                                routing[subnet] = {"latency":avrg,"location":location}
             except Exception as e:
                 print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
 
@@ -92,8 +92,8 @@ else:
     with open(f"{path}/cache/routing.json", 'w') as f: json.dump(aggregated, f)
 
 print("Applying routing rules...")
-for region, subnets in aggregated.items():
-    gw = config['mapping'][region]
+for location, subnets in aggregated.items():
+    gw = config['mapping'][location]
     for subnet in subnets:
         if clear:
             tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
