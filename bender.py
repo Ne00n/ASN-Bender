@@ -53,7 +53,7 @@ for asn in toLoad:
             if f"https://routing.serv.app/data/{region}/{location}/version.json" in asnFiles: continue
             asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/version.json")
 
-print("Downloading latency data")
+print("Loading latency data")
 with ThreadPoolExecutor(max_workers=4) as executor:
     list(tqdm(executor.map(tools.call, asnFiles), total=len(asnFiles)))
 
