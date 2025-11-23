@@ -57,37 +57,31 @@ print("Loading latency data")
 with ThreadPoolExecutor(max_workers=4) as executor:
     list(tqdm(executor.map(tools.call, asnFiles), total=len(asnFiles)))
 
-data = {}
+routing = {}
 for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
             try:
                 with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
-                if not asn in data: data[asn] = {}
-                if not location in data[asn]: data[asn][location] = asnData
+                for prefix,subnets in asnData.items():
+                    if "::" in prefix: continue
+                    settings = {}
+                    for subnet, latency in subnets.items():
+                        if subnet == "settings": settings = latency
+                        if not "/" in subnet or not latency: continue
+                        if settings and 'any' in settings:
+                            for entry in latency:
+                                subnet, avrg = f"{entry[0]}/32", float(entry[1])
+                                if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                                if routing[subnet]['latency'] > avrg:
+                                    routing[subnet] = {"latency":avrg,"region":location}
+                        else:
+                            avrg = tools.getAvrg(latency)
+                            if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                            if routing[subnet]['latency'] > avrg:
+                                routing[subnet] = {"latency":avrg,"region":location}
             except Exception as e:
                 print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
-
-routing = {}
-for asn,regions in data.items():
-    for region,payload in regions.items():
-        for prefix,subnets in payload.items():
-            if "::" in prefix: continue
-            settings = {}
-            for subnet, latency in subnets.items():
-                if subnet == "settings": settings = latency
-                if not "/" in subnet or not latency: continue
-                if settings and 'any' in settings:
-                    for entry in latency:
-                        subnet, avrg = f"{entry[0]}/32", float(entry[1])
-                        if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
-                        if routing[subnet]['latency'] > avrg:
-                            routing[subnet] = {"latency":avrg,"region":region}
-                else:
-                    avrg = tools.getAvrg(latency)
-                    if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
-                    if routing[subnet]['latency'] > avrg:
-                        routing[subnet] = {"latency":avrg,"region":region}
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
