@@ -11,8 +11,7 @@ For example, TF2 or CS2, which is the ASN 32590 for Valve.<br>
 Traffic via Frankfurt goes via your Frankfurt PoP, Amsterdam via your Amsterdam PoP etc.
 
 **Depdencies**<br>
-requests / python3-requests (Debian)<br>
-tqdm     / python3-tqdm (Debian)<br>
+requests + tqdm (python3-requests python3-tqdm for Debian)<br>
 
 **Setup**<br>
 
@@ -28,12 +27,16 @@ Add a lookup rule
 ```
 ip rule add from 0.0.0.0/0 table ASN
 ```
-Any traffic, will look up the routing rules provided by the table ASN.<br>
-Which is used by the ASN-Bender.
+Any traffic (0.0.0.0/0), will look up the routing rules provided by the table ASN.<br>
 
 **Usage**<br>
 
 ```
 python3 bender.py
 python3 bender.py clear
+```
+
+You can manually verify the applied routes with<br>
+```
+ip route show table ASN
 ```
