@@ -8,7 +8,9 @@ Lets say you have your own VPN Network, e.g 172.16.5.0/24.<br>
 And you want to tunnel, selectively, game traffic over it.
 
 For example, TF2 or CS2, which is the ASN 32590 for Valve.<br>
-Traffic for Frankfurt goes via your Frankfurt PoP, traffic for Amsterdam via your Amsterdam PoP etc.
+Traffic for Frankfurt goes via your Frankfurt PoP, traffic for Amsterdam via your Amsterdam PoP etc.<br>
+
+Ideally you have a RaspberryPi or a homeserver, where you can run this and connect with your PC to it.<br>
 
 **Depdencies**<br>
 requests + tqdm (python3-requests python3-tqdm for Debian)<br>
@@ -42,6 +44,7 @@ ip route show table ASN
 ```
 
 **Config**<br>
+
 <b>asnList</b><br>
 Can be empty, contain one or multiple ASN numbers, or 0 for all available ASN's<br>
 <b>asnTags</b><br>
