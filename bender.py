@@ -53,7 +53,7 @@ for asn in toLoad:
             if f"https://routing.serv.app/data/{region}/{location}/version.json" in asnFiles: continue
             asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/version.json")
 
-print("Loading latency data")
+print("Downloading latency data")
 with ThreadPoolExecutor(max_workers=4) as executor:
     list(tqdm(executor.map(tools.call, asnFiles), total=len(asnFiles)))
 
@@ -89,6 +89,7 @@ for asn,regions in data.items():
                     if routing[subnet]['latency'] > avrg:
                         routing[subnet] = {"latency":avrg,"region":region}
 
+print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
 #on clear, use latest.json
 if clear:
