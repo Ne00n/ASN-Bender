@@ -8,7 +8,7 @@ Lets say you have your own VPN Network, e.g 172.16.5.0/24.<br>
 And you want to tunnel, selectively, game traffic over it.
 
 For example, TF2 or CS2, which is the ASN 32590 for Valve.<br>
-Traffic via Frankfurt goes via your Frankfurt PoP, Amsterdam via your Amsterdam PoP etc.
+Traffic for Frankfurt goes via your Frankfurt PoP, traffic for Amsterdam via your Amsterdam PoP etc.
 
 **Depdencies**<br>
 requests + tqdm (python3-requests python3-tqdm for Debian)<br>
@@ -39,4 +39,14 @@ python3 bender.py clear
 You can manually verify the applied routes with<br>
 ```
 ip route show table ASN
+```
+
+**Config**<br>
+<b>asnList</b>
+Can be empty, contain one or multiple ASN numbers, or 0 for all available ASN's<br>
+<b>asnTags</b>
+Can be empty or contain tags such as "valve", for the Valve AS32590<br>
+<b>mapping</b>
+All fields are mandatory, even if, for example you don't have a server in London.<br>
+In this case, map it to Amsterdam or Frankfurt or whatever is geographically close.<br>
 ```
