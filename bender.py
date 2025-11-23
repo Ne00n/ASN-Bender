@@ -61,9 +61,12 @@ data = {}
 for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
-            with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
-            if not asn in data: data[asn] = {}
-            if not location in data[asn]: data[asn][location] = asnData
+            try:
+                with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
+                if not asn in data: data[asn] = {}
+                if not location in data[asn]: data[asn][location] = asnData
+            except Exception as e:
+                print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
 
 routing = {}
 for asn,regions in data.items():
