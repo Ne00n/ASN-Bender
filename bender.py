@@ -14,7 +14,7 @@ tools.updateMirrors()
 with open(f"{path}/config.json") as handle: config =  json.loads(handle.read())
 
 print("Loading asn.json")
-success, availableASNs = tools.call("https://routing.serv.app/asn.json")
+success, availableASNs = tools.call(f"{config['mirror']}/asn.json")
 if not success: exit("Failed to fetch asn.json")
 
 availableASNList, availableTags = [], []
@@ -38,7 +38,7 @@ for selectedTag in config['asnTags']:
             toLoad.append(int(asn))
 
 print("Loading locations.json")
-success, availableLocations = tools.call("https://routing.serv.app/locations.json")
+success, availableLocations = tools.call(f"{config['mirror']}/locations.json")
 if not success: exit("Failed to fetch locations.json")
 
 for region,locations in availableLocations.items():
@@ -50,9 +50,9 @@ toLoad = list(set(toLoad))
 for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
-            asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/{asn}.json")
-            if f"https://routing.serv.app/data/{region}/{location}/version.json" in asnFiles: continue
-            asnFiles.append(f"https://routing.serv.app/data/{region}/{location}/version.json")
+            asnFiles.append(f"{config['mirror']}/data/{region}/{location}/{asn}.json")
+            if f"{config['mirror']}/data/{region}/{location}/version.json" in asnFiles: continue
+            asnFiles.append(f"{config['mirror']}/data/{region}/{location}/version.json")
 
 print("Loading latency data")
 with ThreadPoolExecutor(max_workers=4) as executor:
