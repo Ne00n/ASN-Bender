@@ -1,5 +1,6 @@
 import subprocess, ipaddress, requests, time, json, re, os
 from collections import defaultdict
+from urllib.parse import urlparse
 
 class Base:
 
@@ -60,3 +61,24 @@ class Base:
             aggregated_networks = ipaddress.collapse_addresses(ips)
             aggregated[location] = [str(net) for net in aggregated_networks]
         return aggregated
+
+    def updateMirrors(self):
+        mirrors = ["https://routing.serv.app/"]
+        with open(f"{self.path}/config.json") as handle: config =  json.loads(handle.read())
+        if not "mirrors" in config: config['mirrors'] = []
+        for mirror in mirrors:
+            if not mirror in config['mirrors']: config['mirrors'].append(mirror)
+        if not "mirror" in config:
+            lowest = {"mirror":"","latency":0}
+            print("Choosing closest mirror")
+            for mirror in config['mirrors']:
+                domain = urlparse(mirror).netloc
+                result = self.cmd(f"ping {domain} -c3")
+                match = re.search(r'rtt min\/avg\/max\/mdev = [0-9.]+\/([0-9.]+)\/[0-9.]+\/[0-9.]+ ms', result[0])
+                if match:
+                    if int(match.group(1)) < lowest['latency']:
+                        lowest['latency'] = int(match.group(1))
+                        lowest['mirror'] = mirror
+            if not lowest['mirror']: exit("Unable to find closest mirror.")
+            config['mirror'] = lowest['mirror']
+        with open(f"{self.path}/config.json", 'w') as f: json.dump(config, f, indent=2)

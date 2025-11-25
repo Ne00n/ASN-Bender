@@ -10,6 +10,7 @@ for param in sys.argv:
 
 path = os.path.dirname(os.path.realpath(__file__))
 tools = Base(path)
+tools.updateMirrors()
 with open(f"{path}/config.json") as handle: config =  json.loads(handle.read())
 
 print("Loading asn.json")
