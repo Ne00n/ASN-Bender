@@ -63,7 +63,7 @@ class Base:
         return aggregated
 
     def updateMirrors(self):
-        mirrors = ["https://routing.serv.app/"]
+        mirrors = ["https://routing.serv.app/","https://ch.routing.serv.app/"]
         with open(f"{self.path}/config.json") as handle: config =  json.loads(handle.read())
         if not "mirrors" in config: config['mirrors'] = []
         for mirror in mirrors:
