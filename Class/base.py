@@ -76,8 +76,8 @@ class Base:
                 result = self.cmd(f"ping {domain} -c3")
                 match = re.search(r'rtt min\/avg\/max\/mdev = [0-9.]+\/([0-9.]+)\/[0-9.]+\/[0-9.]+ ms', result[0])
                 if match:
-                    if int(match.group(1)) < lowest['latency']:
-                        lowest['latency'] = int(match.group(1))
+                    if int(float(match.group(1))) < lowest['latency']:
+                        lowest['latency'] = int(float(match.group(1)))
                         lowest['mirror'] = mirror
             if not lowest['mirror']: exit("Unable to find closest mirror.")
             config['mirror'] = lowest['mirror']
