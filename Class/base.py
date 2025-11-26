@@ -69,7 +69,7 @@ class Base:
         for mirror in mirrors:
             if not mirror in config['mirrors']: config['mirrors'].append(mirror)
         if not "mirror" in config:
-            lowest = {"mirror":"","latency":0}
+            lowest = {"mirror":"","latency":999}
             print("Choosing closest mirror")
             for mirror in config['mirrors']:
                 domain = urlparse(mirror).netloc
