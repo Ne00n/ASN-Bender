@@ -50,5 +50,5 @@ Can be empty, contain one or multiple ASN numbers, or 0 for all available ASN's<
 <b>asnTags</b><br>
 Can be empty or contain tags such as "valve", for the Valve AS32590<br>
 <b>mapping</b><br>
-All fields are mandatory, even if, for example you don't have a server in London.<br>
-In this case, map it to Amsterdam or Frankfurt or whatever is geographically close.<br>
+Ideally, you map all the locations, you can leave some out, this might improve or worsen your routing.<br>
+You just have to play around with the mapping for your network.<br>
