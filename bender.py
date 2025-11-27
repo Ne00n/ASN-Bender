@@ -43,13 +43,14 @@ if not success: exit("Failed to fetch locations.json")
 
 for region,locations in availableLocations.items():
     for location in locations:
-        if not location in config['mapping']: exit(f"{location} is not in mapping!")
+        if not location in config['mapping']: print(f"{location} is not in mapping!")
 
 asnFiles = []
 toLoad = list(set(toLoad))
 for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
+            if not location in config['mapping']: continue
             asnFiles.append(f"{config['mirror']}/data/{region}/{location}/{asn}.json")
             if f"{config['mirror']}/data/{region}/{location}/version.json" in asnFiles: continue
             asnFiles.append(f"{config['mirror']}/data/{region}/{location}/version.json")
@@ -62,6 +63,7 @@ routing = {}
 for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
+            if not location in config['mapping']: continue
             try:
                 with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
                 for prefix,subnets in asnData.items():
