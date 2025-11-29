@@ -87,3 +87,8 @@ class Base:
             if not lowest['mirror']: exit("Unable to find closest mirror.")
             config['mirror'] = lowest['mirror']
         with open(f"{self.path}/config.json", 'w') as f: json.dump(config, f, indent=2)
+
+    def inRules(self,config,asnData):
+        for tag in asnData['tags']:
+            if tag in config['rules']:
+                return tag

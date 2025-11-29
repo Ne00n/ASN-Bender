@@ -97,8 +97,13 @@ else:
 
 print("Applying routing rules...")
 for asn, data in aggregated.items():
+    asnData = availableASNs[str(asn)]
     for location, subnets in data.items():
-        gw = config['mapping'][location]
+        tag = tools.inRules(config,asnData)
+        if tag:
+            gw = config['rules'][tag]
+        else:
+            gw = config['mapping'][location]
         for subnet in subnets:
             if clear:
                 tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
