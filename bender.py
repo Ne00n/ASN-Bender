@@ -75,14 +75,14 @@ for asn in toLoad:
                         if settings and 'any' in settings:
                             for entry in latency:
                                 subnet, avrg = f"{entry[0]}/32", float(entry[1])
-                                if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                                if not subnet in routing: routing[subnet] = {"latency":999,"region":None,"asn":None}
                                 if routing[subnet]['latency'] > avrg:
-                                    routing[subnet] = {"latency":avrg,"location":location}
+                                    routing[subnet] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not subnet in routing: routing[subnet] = {"latency":999,"region":""}
+                            if not subnet in routing: routing[subnet] = {"latency":999,"region":None,"asn":None}
                             if routing[subnet]['latency'] > avrg:
-                                routing[subnet] = {"latency":avrg,"location":location}
+                                routing[subnet] = {"latency":avrg,"location":location,"asn":asn}
             except Exception as e:
                 print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
 
