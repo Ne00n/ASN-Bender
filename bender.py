@@ -70,6 +70,7 @@ for asn in toLoad:
                     if "::" in prefix: continue
                     settings = {}
                     for subnet, latency in subnets.items():
+                        if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
                         if subnet == "settings": settings = latency
                         if not "/" in subnet or not latency: continue
                         if not asn in routing: routing[asn] = {}
