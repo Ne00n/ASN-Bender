@@ -87,7 +87,7 @@ for asn in toLoad:
                 print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
 
 print("Aggregating routing rules...")
-aggregated = tools.aggregate(routing)
+aggregated, mapping = tools.aggregate(routing)
 #on clear, use latest.json
 if clear:
     with open(f"{path}/cache/routing.json") as handle: aggregated =  json.loads(handle.read())

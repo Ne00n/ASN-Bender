@@ -55,12 +55,21 @@ class Base:
         for subnet, details in routing.items():
             regionIPs[details['location']].append(ipaddress.ip_network(subnet))
         
-        aggregated = {}
+        aggregated, aggregatedRaw = {}, {}
         for location, ips in regionIPs.items():
             ips.sort()
-            aggregated_networks = ipaddress.collapse_addresses(ips)
-            aggregated[location] = [str(net) for net in aggregated_networks]
-        return aggregated
+            aggregated[location] = [str(net) for net in ipaddress.collapse_addresses(ips)]
+            aggregatedRaw[location] = ipaddress.collapse_addresses(ips)
+
+        mapping = {}
+        for location,orgSubnets in regionIPs.items():
+            for orgSubnet in orgSubnets:
+                for subnet in aggregatedRaw[location]:   
+                    if orgSubnet.subnet_of(subnet):
+                        mapping[str(subnet)] = routing[str(orgSubnet)]
+                        break
+    
+        return aggregated,mapping
 
     def updateMirrors(self):
         mirrors = ["https://routing.serv.app/","https://ch.routing.serv.app/"]
