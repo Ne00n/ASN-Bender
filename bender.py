@@ -101,7 +101,7 @@ for asn, data in aggregated.items():
     for location, subnets in data.items():
         tag = tools.inRules(config,asnData)
         if tag:
-            gw = config['rules'][tag]
+            gw = config['mapping'][config['rules'][tag]]
         else:
             gw = config['mapping'][location]
         for subnet in subnets:
