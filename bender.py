@@ -72,22 +72,23 @@ for asn in toLoad:
                     for subnet, latency in subnets.items():
                         if subnet == "settings": settings = latency
                         if not "/" in subnet or not latency: continue
+                        if not asn in routing: routing[asn] = {}
                         if settings and 'any' in settings:
                             for entry in latency:
                                 subnet, avrg = f"{entry[0]}/32", float(entry[1])
-                                if not subnet in routing: routing[subnet] = {"latency":999,"region":None,"asn":None}
-                                if routing[subnet]['latency'] > avrg:
-                                    routing[subnet] = {"latency":avrg,"location":location,"asn":asn}
+                                if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
+                                if routing[asn][subnet]['latency'] > avrg:
+                                    routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not subnet in routing: routing[subnet] = {"latency":999,"region":None,"asn":None}
-                            if routing[subnet]['latency'] > avrg:
-                                routing[subnet] = {"latency":avrg,"location":location,"asn":asn}
+                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
+                            if routing[asn][subnet]['latency'] > avrg:
+                                routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
             except Exception as e:
                 print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
 
 print("Aggregating routing rules...")
-aggregated, mapping = tools.aggregate(routing)
+aggregated = tools.aggregate(routing)
 #on clear, use latest.json
 if clear:
     with open(f"{path}/cache/routing.json") as handle: aggregated =  json.loads(handle.read())
@@ -95,12 +96,13 @@ else:
     with open(f"{path}/cache/routing.json", 'w') as f: json.dump(aggregated, f)
 
 print("Applying routing rules...")
-for location, subnets in aggregated.items():
-    gw = config['mapping'][location]
-    for subnet in subnets:
-        if clear:
-            tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
-        else:
-            tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
+for asn, data in aggregated.items():
+    for location, subnets in data.items():
+        gw = config['mapping'][location]
+        for subnet in subnets:
+            if clear:
+                tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
+            else:
+                tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
 
 print("Done")

@@ -51,25 +51,21 @@ class Base:
         return round(avrg / len(pings),1)
 
     def aggregate(self,routing):
-        regionIPs = defaultdict(list)
-        for subnet, details in routing.items():
-            regionIPs[details['location']].append(ipaddress.ip_network(subnet))
+        regionIPs = {}
+        for asn, subnets in routing.items():
+            for subnet, details in subnets.items():
+                if not asn in regionIPs: regionIPs[asn] = {}
+                if not details['location'] in regionIPs[asn]: regionIPs[asn][details['location']] = []
+                regionIPs[asn][details['location']].append(ipaddress.ip_network(subnet))
         
-        aggregated, aggregatedRaw = {}, {}
-        for location, ips in regionIPs.items():
-            ips.sort()
-            aggregated[location] = [str(net) for net in ipaddress.collapse_addresses(ips)]
-            aggregatedRaw[location] = ipaddress.collapse_addresses(ips)
-
-        mapping = {}
-        for location,orgSubnets in regionIPs.items():
-            for orgSubnet in orgSubnets:
-                for subnet in aggregatedRaw[location]:   
-                    if orgSubnet.subnet_of(subnet):
-                        mapping[str(subnet)] = routing[str(orgSubnet)]
-                        break
+        aggregated = {}
+        for asn, data in regionIPs.items():
+            if not asn in aggregated: aggregated[asn] = {}
+            for location, subnets in data.items():
+                if not location in aggregated[asn]: aggregated[asn][location] = []
+                aggregated[asn][location] = [str(net) for net in ipaddress.collapse_addresses(subnets)]
     
-        return aggregated,mapping
+        return aggregated
 
     def updateMirrors(self):
         mirrors = ["https://routing.serv.app/","https://ch.routing.serv.app/"]
