@@ -56,12 +56,13 @@ for asn in toLoad:
             if f"{config['mirror']}/data/{region}/{location}/version.json" in asnFiles: continue
             asnFiles.append(f"{config['mirror']}/data/{region}/{location}/version.json")
 
-print("Loading latency data")
+print("Fetching latency data")
 toolCall = partial(tools.call, skipLoading=True)
 with ThreadPoolExecutor(max_workers=4) as executor:
     list(tqdm(executor.map(toolCall, asnFiles), total=len(asnFiles)))
 
 routing = {}
+print("Loading latency data")
 for asn in toLoad:
     for region,locations in availableLocations.items():
         for location in locations:
