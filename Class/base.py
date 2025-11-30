@@ -7,7 +7,7 @@ class Base:
     def __init__(self,path):
         self.path = path
 
-    def call(self,url,max=5):
+    def call(self,url,skipReturn=False,max=5):
         allowedCodes, alwaysFetch = [200], ("asn.json","locations.json","version.json")
         for run in range(1,max):
             try:
@@ -16,6 +16,7 @@ class Base:
                 if os.path.isfile(f"{self.path}/cache/{path}"):
                     #not older than 1 hour
                     if os.path.getmtime(f"{self.path}/cache/{path}") + (60*60) > int(time.time()):
+                        if skipReturn: return True,None
                         with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
                         return True,file
                     elif not path.endswith(alwaysFetch):

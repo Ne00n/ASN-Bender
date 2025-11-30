@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 import subprocess, requests, json, sys, os, re
+from functools import partial
 from Class.base import Base
 from tqdm import tqdm
 
@@ -56,8 +57,9 @@ for asn in toLoad:
             asnFiles.append(f"{config['mirror']}/data/{region}/{location}/version.json")
 
 print("Loading latency data")
+toolCall = partial(tools.call, skipReturn=True)
 with ThreadPoolExecutor(max_workers=4) as executor:
-    list(tqdm(executor.map(tools.call, asnFiles), total=len(asnFiles)))
+    list(tqdm(executor.map(toolCall, asnFiles), total=len(asnFiles)))
 
 routing = {}
 for asn in toLoad:
