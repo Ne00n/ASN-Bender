@@ -30,7 +30,8 @@ class Base:
                 #download
                 os.makedirs(os.path.dirname(f"{self.path}/cache/{path}"), exist_ok=True)
                 req = requests.get(url, timeout=(5,5))
-                if req.status_code in allowedCodes: 
+                if req.status_code in allowedCodes:
+                    if skipLoading: return True,None 
                     file = req.json()
                     with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
                     return True,file
