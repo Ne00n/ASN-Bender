@@ -35,6 +35,8 @@ class Base:
                     with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
                     if skipLoading: return True,None 
                     return True,file
+                elif req.status_code == 404:
+                    return False,{}
             except Exception as ex:
                 pass
             if run == 4: return False,{}
