@@ -89,7 +89,7 @@ for asn in toLoad:
                             if routing[asn][subnet]['latency'] > avrg:
                                 routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
             except Exception as e:
-                print(f"Failed to load /cache/data/{region}/{location}/{asn}.json")
+                print(e)
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
