@@ -31,9 +31,9 @@ class Base:
                 os.makedirs(os.path.dirname(f"{self.path}/cache/{path}"), exist_ok=True)
                 req = requests.get(url, timeout=(5,5))
                 if req.status_code in allowedCodes:
-                    if skipLoading: return True,None 
                     file = req.json()
                     with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
+                    if skipLoading: return True,None 
                     return True,file
             except Exception as ex:
                 pass
