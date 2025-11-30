@@ -8,7 +8,7 @@ class Base:
         self.path = path
 
     def call(self,url,skipLoading=False,max=5):
-        allowedCodes, alwaysFetch = [200], ("asn.json","locations.json","version.json")
+        alwaysFetch = ("asn.json","locations.json","version.json")
         for run in range(1,max):
             try:
                 path, last =  '/'.join(url.split("/")[3:]), url.split("/")[-1]
@@ -30,7 +30,7 @@ class Base:
                 #download
                 os.makedirs(os.path.dirname(f"{self.path}/cache/{path}"), exist_ok=True)
                 req = requests.get(url, timeout=(5,5))
-                if req.status_code in allowedCodes:
+                if req.status_code == 200:
                     file = req.json()
                     with open(f"{self.path}/cache/{path}", 'w') as f: json.dump(file, f)
                     if skipLoading: return True,None 
