@@ -16,7 +16,7 @@ class Base:
                 if os.path.isfile(f"{self.path}/cache/{path}"):
                     #not older than 1 hour
                     if os.path.getmtime(f"{self.path}/cache/{path}") + (60*60) > int(time.time()):
-                        if skipLoading: return True,None
+                        if skipLoading: return True,{}
                         with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
                         return True,file
                     elif not path.endswith(alwaysFetch):
@@ -24,7 +24,7 @@ class Base:
                         if os.path.isfile(f"{self.path}/cache/{versionFile}"):
                             with open(f"{self.path}/cache/{versionFile}") as handle: version =  json.loads(handle.read())
                             if version['version'] < os.path.getatime(f"{self.path}/cache/{path}"):
-                                if skipLoading: return True,None
+                                if skipLoading: return True,{}
                                 with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
                                 return True,file
                 #download
