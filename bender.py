@@ -42,9 +42,11 @@ print("Loading locations.json")
 success, availableLocations = tools.call(f"{config['mirror']}/locations.json")
 if not success: exit("Failed to fetch locations.json")
 
+notMapped = []
 for region,locations in availableLocations.items():
     for location in locations:
-        if not location in config['mapping']: print(f"{location} is not in mapping!")
+        if not location in config['mapping']: notMapped.append(location)
+print(",".join(notMapped),"are not in mapping!")
 
 asnFiles = []
 toLoad = list(set(toLoad))
