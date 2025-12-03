@@ -66,6 +66,7 @@ with ThreadPoolExecutor(max_workers=4) as executor:
 routing = {}
 print("Loading latency data")
 for asn in toLoad:
+    if not asn in routing: routing[asn] = {}
     for region,locations in availableLocations.items():
         for location in locations:
             if not location in config['mapping']: continue
@@ -78,11 +79,10 @@ for asn in toLoad:
                         if "ignoreSubnets" in config and entry in config['ignoreSubnets']: continue
                         if entry == "settings": settings = data
                         if not "/" in entry or not data: continue
-                        if not asn in routing: routing[asn] = {}
                         if settings and 'any' in settings:
                             for entry in data:
                                 entry, avrg = f"{entry[0]}/32", float(entry[1])
-                                if not entry in routing[asn]: routing[asn][entry] = {"data":999,"region":None,"asn":None}
+                                if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
                                 if routing[asn][entry]['latency'] > avrg:
                                     routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
                         else:
