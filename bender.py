@@ -74,22 +74,22 @@ for asn in toLoad:
                 for prefix,subnets in asnData.items():
                     if "::" in prefix: continue
                     settings = {}
-                    for subnet, latency in subnets.items():
-                        if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
-                        if subnet == "settings": settings = latency
-                        if not "/" in subnet or not latency: continue
+                    for entry, latency in subnets.items():
+                        if "ignoreSubnets" in config and entry in config['ignoreSubnets']: continue
+                        if entry == "settings": settings = latency
+                        if not "/" in entry or not latency: continue
                         if not asn in routing: routing[asn] = {}
                         if settings and 'any' in settings:
                             for entry in latency:
-                                subnet, avrg = f"{entry[0]}/32", float(entry[1])
-                                if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
-                                if routing[asn][subnet]['latency'] > avrg:
-                                    routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
+                                entry, avrg = f"{entry[0]}/32", float(entry[1])
+                                if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
+                                if routing[asn][entry]['latency'] > avrg:
+                                    routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
-                            if routing[asn][subnet]['latency'] > avrg:
-                                routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
+                            if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
+                            if routing[asn][entry]['latency'] > avrg:
+                                routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
             except Exception as e:
                 print(e)
 
