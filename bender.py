@@ -72,21 +72,18 @@ for asn in toLoad:
             if not location in config['mapping']: continue
             try:
                 with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
-                for prefix,subnets in asnData.items():
+                for prefix, row in asnData.items():
                     if "::" in prefix: continue
-                    settings = {}
-                    for entry, data in subnets.items():
-                        if "ignoreSubnets" in config and entry in config['ignoreSubnets']: continue
-                        if entry == "settings": settings = data
-                        if not "/" in entry or not data: continue
-                        if settings and 'any' in settings:
-                            for entry in data:
-                                entry, avrg = f"{entry[0]}/32", float(entry[1])
+                    for subnet, latency in row['data'].items():
+                        if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
+                        if row['settings'] and 'any' in row['settings']:
+                            for entry in latency:
+                                entry, avrg = f"{'.'.join(subnet.split('.')[:3])}.{entry[0]}/32", float(entry[1])
                                 if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
                                 if routing[asn][entry]['latency'] > avrg:
                                     routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
                         else:
-                            avrg = tools.getAvrg(data)
+                            avrg = tools.getAvrg(latency)
                             if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
                             if routing[asn][entry]['latency'] > avrg:
                                 routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
