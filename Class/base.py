@@ -82,14 +82,18 @@ class Base:
             lowest = {"mirror":"","latency":999}
             print("Choosing closest mirror")
             for mirror in config['mirrors']:
-                domain = urlparse(mirror).netloc
-                result = self.cmd(f"ping {domain} -c3")
-                match = re.search(r'rtt min\/avg\/max\/mdev = [0-9.]+\/([0-9.]+)\/[0-9.]+\/[0-9.]+ ms', result[0])
-                if match:
-                    if int(float(match.group(1))) < lowest['latency']:
-                        lowest['latency'] = int(float(match.group(1)))
+                try:
+                    req = requests.get(f"{mirror}/locations.json", timeout=(5,5))
+                    if req.status_code != 200: 
+                        print(f"Ignoring {mirror}, non 200 status code")
+                        continue
+                    if float(req.elapsed.total_seconds()) < lowest['latency']:
+                        lowest['latency'] = float(req.elapsed.total_seconds())
                         lowest['mirror'] = mirror
+                except Exception as e:
+                    print(f"Failed to get response time from mirror {mirror}: {e}")
             if not lowest['mirror']: exit("Unable to find closest mirror.")
+            print(f"Selected {lowest['mirror']} as mirror")
             config['mirror'] = lowest['mirror']
         with open(f"{self.path}/config.json", 'w') as f: json.dump(config, f, indent=2)
 
