@@ -80,15 +80,15 @@ for asn in toLoad:
                         if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
                         if row['settings'] and 'any' in row['settings']:
                             for entry in latency:
-                                entry, avrg = f"{'.'.join(subnet.split('.')[:3])}.{entry[0]}/32", float(entry[1])
-                                if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
-                                if routing[asn][entry]['latency'] > avrg:
-                                    routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
+                                subnet, avrg = f"{'.'.join(subnet.split('.')[:3])}.{entry[0]}/32", float(entry[1])
+                                if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
+                                if routing[asn][subnet]['latency'] > avrg:
+                                    routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not entry in routing[asn]: routing[asn][entry] = {"latency":999,"region":None,"asn":None}
-                            if routing[asn][entry]['latency'] > avrg:
-                                routing[asn][entry] = {"latency":avrg,"location":location,"asn":asn}
+                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
+                            if routing[asn][subnet]['latency'] > avrg:
+                                routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
             except Exception as e:
                 print(e)
 
