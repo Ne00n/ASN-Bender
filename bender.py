@@ -75,6 +75,7 @@ for asn in toLoad:
                 for prefix, row in asnData.items():
                     if "::" in prefix: continue
                     for subnet, latency in row['data'].items():
+                        if not latency: continue
                         if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
                         if row['settings'] and 'any' in row['settings']:
                             for entry in latency:
