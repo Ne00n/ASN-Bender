@@ -46,7 +46,7 @@ notMapped = []
 for region,locations in availableLocations.items():
     for location in locations:
         if not location in config['mapping']: notMapped.append(location)
-if not notMapped: print(",".join(notMapped),"are not in mapping!")
+if notMapped: print(",".join(notMapped),"are not in mapping!")
 
 asnFiles = []
 toLoad = list(set(toLoad))
