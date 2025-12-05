@@ -74,6 +74,7 @@ for asn in toLoad:
                 with open(f"{path}/cache/data/{region}/{location}/{asn}.json") as handle: asnData =  json.loads(handle.read())
                 for prefix, row in asnData.items():
                     if "::" in prefix: continue
+                    if not "data" in row: continue
                     for subnet, latency in row['data'].items():
                         if not latency: continue
                         if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
