@@ -81,12 +81,12 @@ for asn in toLoad:
                         if row['settings'] and 'any' in row['settings']:
                             for entry in latency:
                                 subnet, avrg = f"{'.'.join(subnet.split('.')[:3])}.{entry[0]}/32", float(entry[1])
-                                if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
+                                if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"location":None,"asn":None}
                                 if routing[asn][subnet]['latency'] > avrg:
                                     routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"region":None,"asn":None}
+                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"location":None,"asn":None}
                             if routing[asn][subnet]['latency'] > avrg:
                                 routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
             except Exception as e:
