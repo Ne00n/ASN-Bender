@@ -100,6 +100,7 @@ for asn in toLoad:
 
 for asn,data in routing.items():
     for subnet,details in list(data.items()):
+        if not "region" in details: continue
         if "NA" in details['region'] and "EU" in details['region']:
             diff = abs(details['region']['EU']-details['region']['NA'])
             if diff < 50 and "ignoreAnycast" in config: 
