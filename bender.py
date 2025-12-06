@@ -86,11 +86,27 @@ for asn in toLoad:
                                     routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"location":None,"asn":None}
+                            if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"location":None,"region":{},"asn":None}
                             if routing[asn][subnet]['latency'] > avrg:
-                                routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
+                                currentRegion = routing[asn][subnet]["region"]
+                                if not region in currentRegion: currentRegion[region] = avrg
+                                routing[asn][subnet] = {"latency":avrg,"location":location,"region":currentRegion,"asn":asn}
+                            else:
+                                currentRegion = routing[asn][subnet]["region"]
+                                if not region in currentRegion: currentRegion[region] = avrg
+                                routing[asn][subnet]['region'] = currentRegion
             except Exception as e:
                 print(e)
+
+if "ignoreAnycast" in config:
+    for asn,data in routing.items():
+        for subnet,details in list(data.items()):
+            if "NA" in details['region'] and "EU" in details['region']:
+                diff = abs(details['region']['EU']-details['region']['NA'])
+                if diff < 50: del routing[asn][subnet]
+            elif "AS" in details['region'] and "EU" in details['region']:
+                diff = abs(details['region']['EU']-details['region']['AS'])
+                if diff < 50: del routing[asn][subnet]
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
