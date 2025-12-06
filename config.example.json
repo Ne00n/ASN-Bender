@@ -6,5 +6,6 @@
         "MTL":"10.0.251.60"
     },
     "ignoreSubnets": [],
+    "ignoreAnycast": false,
     "rules":{}
 }

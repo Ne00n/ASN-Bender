@@ -98,15 +98,20 @@ for asn in toLoad:
             except Exception as e:
                 print(e)
 
-if "ignoreAnycast" in config:
-    for asn,data in routing.items():
-        for subnet,details in list(data.items()):
-            if "NA" in details['region'] and "EU" in details['region']:
-                diff = abs(details['region']['EU']-details['region']['NA'])
-                if diff < 50: del routing[asn][subnet]
-            elif "AS" in details['region'] and "EU" in details['region']:
-                diff = abs(details['region']['EU']-details['region']['AS'])
-                if diff < 50: del routing[asn][subnet]
+for asn,data in routing.items():
+    for subnet,details in list(data.items()):
+        if "NA" in details['region'] and "EU" in details['region']:
+            diff = abs(details['region']['EU']-details['region']['NA'])
+            if diff < 50 and "ignoreAnycast" in config: 
+                del routing[asn][subnet]
+            elif diff < 50 and "anycast" in config:
+                routing[asn][subnet]['location'] = config["anycast"]
+        elif "AS" in details['region'] and "EU" in details['region']:
+            diff = abs(details['region']['EU']-details['region']['AS'])
+            if diff < 50 and "ignoreAnycast" in config: 
+                del routing[asn][subnet]
+            elif diff < 50 and "anycast" in config:
+                routing[asn][subnet]['location'] = config["anycast"]
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
