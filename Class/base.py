@@ -56,20 +56,23 @@ class Base:
         return round(avrg / len(pings),1)
 
     def aggregate(self,routing):
-        regionIPs = {}
+        regionIPs, totalSubnets = {}, 0
         for asn, subnets in routing.items():
+            totalSubnets += len(subnets)
             for subnet, details in subnets.items():
                 if not asn in regionIPs: regionIPs[asn] = {}
                 if not details['location'] in regionIPs[asn]: regionIPs[asn][details['location']] = []
                 regionIPs[asn][details['location']].append(ipaddress.ip_network(subnet))
         
-        aggregated = {}
+        aggregated, aggregatedSubnets = {}, 0
         for asn, data in regionIPs.items():
             if not asn in aggregated: aggregated[asn] = {}
             for location, subnets in data.items():
                 if not location in aggregated[asn]: aggregated[asn][location] = []
                 aggregated[asn][location] = [str(net) for net in ipaddress.collapse_addresses(subnets)]
-    
+                aggregatedSubnets += len(aggregated[asn][location])
+
+        print(f"Aggregated {totalSubnets} subnets to {aggregatedSubnets} subnets")
         return aggregated
 
     def updateMirrors(self):
