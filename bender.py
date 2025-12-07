@@ -95,25 +95,20 @@ for asn in toLoad:
                                 currentRegion = routing[asn][subnet]["region"]
                                 if not region in currentRegion: currentRegion[region] = avrg
                                 routing[asn][subnet]['region'] = currentRegion
+                            if "NA" in currentRegion and "EU" in currentRegion:
+                                diff = abs(currentRegion['EU']-currentRegion['NA'])
+                                if diff < 50 and "ignoreAnycast" in config: 
+                                    del routing[asn][subnet]
+                                elif diff < 50 and "anycast" in config:
+                                    routing[asn][subnet]['location'] = config["anycast"]
+                            elif "AS" in currentRegion and "EU" in currentRegion:
+                                diff = abs(currentRegion['EU']-currentRegion['AS'])
+                                if diff < 50 and "ignoreAnycast" in config: 
+                                    del routing[asn][subnet]
+                                elif diff < 50 and "anycast" in config:
+                                    routing[asn][subnet]['location'] = config["anycast"]
             except Exception as e:
                 print(e)
-
-if "anycast" in config or "ignoreAnycast" in config:
-    for asn,data in routing.items():
-        for subnet,details in list(data.items()):
-            if not "region" in details: continue
-            if "NA" in details['region'] and "EU" in details['region']:
-                diff = abs(details['region']['EU']-details['region']['NA'])
-                if diff < 50 and "ignoreAnycast" in config: 
-                    del routing[asn][subnet]
-                elif diff < 50 and "anycast" in config:
-                    routing[asn][subnet]['location'] = config["anycast"]
-            elif "AS" in details['region'] and "EU" in details['region']:
-                diff = abs(details['region']['EU']-details['region']['AS'])
-                if diff < 50 and "ignoreAnycast" in config: 
-                    del routing[asn][subnet]
-                elif diff < 50 and "anycast" in config:
-                    routing[asn][subnet]['location'] = config["anycast"]
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
