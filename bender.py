@@ -108,7 +108,7 @@ for asn in toLoad:
                                 elif diff < 50 and "anycast" in config:
                                     routing[asn][subnet]['location'] = config["anycast"]
             except Exception as e:
-                print(e)
+                print(f"Error: {e}")
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
