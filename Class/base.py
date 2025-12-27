@@ -23,7 +23,7 @@ class Base:
                         versionFile = path.replace(last,"version.json")
                         if os.path.isfile(f"{self.path}/cache/{versionFile}"):
                             with open(f"{self.path}/cache/{versionFile}") as handle: version =  json.loads(handle.read())
-                            if version['version'] < os.path.getatime(f"{self.path}/cache/{path}"):
+                            if version['files'][path.split("/")[-1]]['version'] < os.path.getmtime(f"{self.path}/cache/{path}"):
                                 if skipLoading: return True,{}
                                 with open(f"{self.path}/cache/{path}") as handle: file =  json.loads(handle.read())
                                 return True,file
