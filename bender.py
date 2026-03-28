@@ -68,7 +68,7 @@ toolCall = partial(tools.call, skipLoading=True)
 with ThreadPoolExecutor(max_workers=4) as executor:
     list(tqdm(executor.map(toolCall, asnFiles), total=len(asnFiles)))
 
-routing = {}
+routing, duplicate = {}, {}
 print("Loading latency data")
 for asn in toLoad:
     if not asn in routing: routing[asn] = {}
@@ -82,6 +82,9 @@ for asn in toLoad:
                     if not "data" in row: continue
                     for subnet, latency in row['data'].items():
                         if not latency: continue
+                        if not subnet in duplicate: duplicate[subnet] = asn
+                        if duplicate[subnet] != asn:
+                            print(f"Found duplicate subnet announced by different ASN{asn} vs {duplicate[subnet]}")
                         if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
                         if row['settings'] and 'any' in row['settings']:
                             for entry in latency:
@@ -101,6 +104,7 @@ for asn in toLoad:
             except Exception as e:
                 print(f"Error: {e}")
 
+duplicate = {}
 if "anycast" in config or "ignoreAnycast" in config:
     for asn,data in routing.items():
         for subnet,details in list(data.items()):
