@@ -83,8 +83,7 @@ for asn in toLoad:
                     for subnet, latency in row['data'].items():
                         if not latency: continue
                         if not subnet in duplicate: duplicate[subnet] = asn
-                        if duplicate[subnet] != asn:
-                            print(f"Found duplicate subnet announced by different ASN{asn} vs {duplicate[subnet]}")
+                        if duplicate[subnet] != asn: continue
                         if "ignoreSubnets" in config and subnet in config['ignoreSubnets']: continue
                         if row['settings'] and 'any' in row['settings']:
                             for entry in latency:
