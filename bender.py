@@ -9,6 +9,11 @@ sys.argv = sys.argv[1:]
 for param in sys.argv:
     if param.lower() == "clear": clear = True
 
+if clear:
+    print("Flushing Routing Table...")
+    self.cmd('ip route flush table ASN')
+    exit()
+
 path = os.path.dirname(os.path.realpath(__file__))
 tools = Base(path)
 tools.updateMirrors()
@@ -117,11 +122,6 @@ if "anycast" in config or "ignoreAnycast" in config:
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
-#on clear, use latest.json
-if clear:
-    with open(f"{path}/cache/routing.json") as handle: aggregated =  json.loads(handle.read())
-else:
-    with open(f"{path}/cache/routing.json", 'w') as f: json.dump(aggregated, f)
 
 print("Applying routing rules...")
 for asn, data in aggregated.items():
