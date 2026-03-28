@@ -100,6 +100,21 @@ class Base:
             config['mirror'] = lowest['mirror']
         with open(f"{self.path}/config.json", 'w') as f: json.dump(config, f, indent=2)
 
+    def batch(self,aggregated,config,availableASNs,clear):
+        batch = ""
+        for asn, data in aggregated.items():
+            asnData = availableASNs[str(asn)]
+            for location, subnets in data.items():
+                tag = self.inRules(config,asnData)
+                if tag:
+                    gw = config['mapping'][config['rules'][tag]]
+                else:
+                    gw = config['mapping'][location]
+                for subnet in subnets:
+                    batch += f'ip route add {subnet} via {gw} dev vxlan1 table ASN\n'
+        with open(f"{self.path}/routing.batch", 'w') as f: f.write(batch)
+        self.cmd(f'ip -batch {self.path}/routing.batch')
+
     def inRules(self,config,asnData):
         for tag in asnData['tags']:
             if tag in config['rules']:

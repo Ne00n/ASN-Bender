@@ -122,20 +122,6 @@ if "anycast" in config or "ignoreAnycast" in config:
 
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
-
 print("Applying routing rules...")
-for asn, data in aggregated.items():
-    asnData = availableASNs[str(asn)]
-    for location, subnets in data.items():
-        tag = tools.inRules(config,asnData)
-        if tag:
-            gw = config['mapping'][config['rules'][tag]]
-        else:
-            gw = config['mapping'][location]
-        for subnet in subnets:
-            if clear:
-                tools.cmd(f'ip route del {subnet} via {gw} dev vxlan1 table ASN')
-            else:
-                tools.cmd(f'ip route add {subnet} via {gw} dev vxlan1 table ASN')
-
+tools.batch(aggregated,config,availableASNs,clear)
 print("Done")
