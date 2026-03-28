@@ -91,13 +91,14 @@ for asn in toLoad:
                                     routing[asn][subnet] = {"latency":avrg,"location":location,"asn":asn}
                         else:
                             avrg = tools.getAvrg(latency)
-                            if not region in currentRegion: currentRegion[region] = avrg
                             if not subnet in routing[asn]: routing[asn][subnet] = {"latency":999,"location":None,"region":{},"asn":None}
                             if routing[asn][subnet]['latency'] > avrg:
                                 currentRegion = routing[asn][subnet]["region"]
+                                if not region in currentRegion: currentRegion[region] = avrg
                                 routing[asn][subnet] = {"latency":avrg,"location":location,"region":currentRegion,"asn":asn}
                             else:
                                 currentRegion = routing[asn][subnet]["region"]
+                                if not region in currentRegion: currentRegion[region] = avrg
                                 routing[asn][subnet]['region'] = currentRegion
             except Exception as e:
                 print(f"Error: {e}")
