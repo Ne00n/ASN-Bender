@@ -9,15 +9,15 @@ sys.argv = sys.argv[1:]
 for param in sys.argv:
     if param.lower() == "clear": clear = True
 
-if clear:
-    print("Flushing Routing Table...")
-    tools.cmd('ip route flush table ASN')
-    exit()
-
 path = os.path.dirname(os.path.realpath(__file__))
 tools = Base(path)
 tools.updateMirrors()
 with open(f"{path}/config.json") as handle: config =  json.loads(handle.read())
+
+if clear:
+    print("Flushing Routing Table...")
+    tools.cmd('ip route flush table ASN')
+    exit()
 
 print("Loading asn.json")
 success, availableASNs = tools.call(f"{config['mirror']}/asn.json")
