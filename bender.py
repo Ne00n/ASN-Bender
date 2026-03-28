@@ -11,7 +11,7 @@ for param in sys.argv:
 
 if clear:
     print("Flushing Routing Table...")
-    self.cmd('ip route flush table ASN')
+    tools.cmd('ip route flush table ASN')
     exit()
 
 path = os.path.dirname(os.path.realpath(__file__))
