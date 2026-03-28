@@ -123,5 +123,5 @@ if "anycast" in config or "ignoreAnycast" in config:
 print("Aggregating routing rules...")
 aggregated = tools.aggregate(routing)
 print("Applying routing rules...")
-tools.batch(aggregated,config,availableASNs,clear)
+tools.batch(aggregated,config,availableASNs)
 print("Done")

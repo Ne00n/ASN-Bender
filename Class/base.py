@@ -100,7 +100,7 @@ class Base:
             config['mirror'] = lowest['mirror']
         with open(f"{self.path}/config.json", 'w') as f: json.dump(config, f, indent=2)
 
-    def batch(self,aggregated,config,availableASNs,clear):
+    def batch(self,aggregated,config,availableASNs):
         batch = ""
         for asn, data in aggregated.items():
             asnData = availableASNs[str(asn)]
@@ -111,7 +111,7 @@ class Base:
                 else:
                     gw = config['mapping'][location]
                 for subnet in subnets:
-                    batch += f'ip route add {subnet} via {gw} dev vxlan1 table ASN\n'
+                    batch += f'route add {subnet} via {gw} dev vxlan1 table ASN\n'
         with open(f"{self.path}/routing.batch", 'w') as f: f.write(batch)
         self.cmd(f'ip -batch {self.path}/routing.batch')
 
